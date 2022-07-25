@@ -3,6 +3,9 @@ use itertools::izip;
 use regex::Regex;
 
 pub fn sort_numbered_titles(file_contents: &str) -> String {
+    let file_lines: Vec<String> = file_contents.lines().map(|x| String::from(x)).collect();
+    let number_of_lines = file_lines.len();
+
     //depth 1
     // TODO title positions can be used as parameter of correct_titles function to not iterate over the whole file again
     let title_positions: Vec<usize> = get_title_positions(file_contents);
@@ -11,7 +14,7 @@ pub fn sort_numbered_titles(file_contents: &str) -> String {
 
     // depth 2
     let mut title_numbers_range = 1..number_of_titles + 1;
-    let next_title_positions = get_next_title_positions(&title_positions, file_contents);
+    let next_title_positions = get_next_title_positions(&title_positions, number_of_lines);
     for (previous_title_position, next_title_position) in
         izip!(title_positions, next_title_positions)
     {
@@ -68,10 +71,10 @@ fn process_subtitle_line(line: &str, title_number: usize, subtitle_number: usize
     processed_line
 }
 
-fn get_next_title_positions(title_positions: &Vec<usize>, file_contents: &str) -> Vec<usize> {
+fn get_next_title_positions(title_positions: &Vec<usize>, number_of_lines: usize) -> Vec<usize> {
     let next_title_positions: Vec<usize> = title_positions[1..title_positions.len()].to_vec();
     let next_title_positions: Vec<usize> =
-        [next_title_positions, [file_contents.len()].to_vec()].concat();
+        [next_title_positions, [number_of_lines].to_vec()].concat();
     next_title_positions
 }
 
@@ -98,6 +101,7 @@ fn process_line(line: &str, line_number: usize) -> String {
     processed_line
 }
 
+// TODO this builds the pattern for storing
 fn get_title_pattern(depth: u64) -> String {
     let base_pattern: &str = r"^\d\. ";
     let mut title_pattern: String = String::from("");
@@ -147,17 +151,6 @@ fn has_subtitle(line: &str) -> bool {
     let re = Regex::new(r"^\d\.\d\. ").unwrap();
     let has_subtitle = re.is_match(line);
     has_subtitle
-}
-
-fn is_subtitle_between_titles(_tuple: &(usize, usize, usize)) -> bool {
-    let title_position = _tuple.0;
-    let other_title_position = _tuple.1;
-    let subtitle_position = _tuple.2;
-    if title_position < subtitle_position && subtitle_position < other_title_position {
-        return true;
-    } else {
-        return false;
-    }
 }
 
 #[cfg(test)]
