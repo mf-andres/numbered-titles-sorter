@@ -35,15 +35,8 @@ pub fn sort_numbered_titles(file_contents: &str) -> String {
             number_of_subtitles_between_titles,
         );
     }
-    let processed_file_contents = String::from("");
+    let processed_file_contents = file_lines.join("\n");
     processed_file_contents
-}
-
-fn get_next_title_positions(title_positions: &Vec<usize>, number_of_lines: usize) -> Vec<usize> {
-    let next_title_positions: Vec<usize> = title_positions[1..title_positions.len()].to_vec();
-    let next_title_positions: Vec<usize> =
-        [next_title_positions, [number_of_lines].to_vec()].concat();
-    next_title_positions
 }
 
 fn get_title_positions(file_contents: &str, title_depth: u64) -> Vec<usize> {
@@ -105,6 +98,13 @@ fn title_from(title_numbers: Vec<usize>) -> String {
     }
     title.push_str(" ");
     title
+}
+
+fn get_next_title_positions(title_positions: &Vec<usize>, number_of_lines: usize) -> Vec<usize> {
+    let next_title_positions: Vec<usize> = title_positions[1..title_positions.len()].to_vec();
+    let next_title_positions: Vec<usize> =
+        [next_title_positions, [number_of_lines].to_vec()].concat();
+    next_title_positions
 }
 
 fn get_subtitle_positions_between_titles(
