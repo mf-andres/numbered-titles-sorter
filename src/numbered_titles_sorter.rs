@@ -3,12 +3,17 @@ use itertools::izip;
 use regex::Regex;
 
 pub fn sort_numbered_titles(file_contents: &str) -> String {
+    // Extract lines and number of lines from file_contents
     let file_lines: Vec<String> = file_contents.lines().map(|x| String::from(x)).collect();
     let number_of_lines = file_lines.len();
 
+    // Search for all title and subtitle positions
+    let title_positions: Vec<usize> = get_title_positions(file_contents, 0);
+    let subtitle_positions: Vec<usize> = get_title_positions(file_contents, 1);
+
+    /*
     //depth 1
     // TODO title positions can be used as parameter of correct_titles function to not iterate over the whole file again
-    let title_positions: Vec<usize> = get_title_positions(file_contents);
     let number_of_titles: usize = title_positions.len();
     let mut processed_file_contents = correct_titles(file_contents, number_of_titles);
 
@@ -34,6 +39,8 @@ pub fn sort_numbered_titles(file_contents: &str) -> String {
     }
 
     println!("{}", processed_file_contents);
+    */
+    let processed_file_contents = String::from("");
     processed_file_contents
 }
 
@@ -78,20 +85,34 @@ fn get_next_title_positions(title_positions: &Vec<usize>, number_of_lines: usize
     next_title_positions
 }
 
-fn get_title_positions(file_contents: &str) -> Vec<usize> {
+fn get_title_positions(file_contents: &str, title_depth: u64) -> Vec<usize> {
     let mut title_positions: Vec<usize> = vec![];
     for (line_number, line) in file_contents.lines().enumerate() {
-        if has_title(line) {
+        if has_title(line, title_depth) {
             title_positions.push(line_number);
         }
     }
+    println!("title positions: {:?}", title_positions);
     title_positions
 }
 
-fn has_title(line: &str) -> bool {
-    let re = Regex::new(r"^\d\. ").unwrap();
+fn has_title(line: &str, title_depth: u64) -> bool {
+    let title_pattern = get_title_pattern(title_depth);
+    let re = Regex::new(&title_pattern).unwrap();
     let has_title = re.is_match(line);
     has_title
+}
+
+fn get_title_pattern(title_depth: u64) -> String {
+    let base_pattern: &str = r"^\d\.";
+    let pattern_extension: &str = r"\d\.";
+    let mut title_pattern: String = String::from(base_pattern);
+    for _ in 1..title_depth + 1 {
+        title_pattern.push_str(pattern_extension);
+    }
+    title_pattern.push_str(" ");
+    println!("pattern {}", &title_pattern);
+    title_pattern
 }
 
 fn process_line(line: &str, line_number: usize) -> String {
@@ -101,22 +122,12 @@ fn process_line(line: &str, line_number: usize) -> String {
     processed_line
 }
 
-// TODO this builds the pattern for storing
-fn get_title_pattern(depth: u64) -> String {
-    let base_pattern: &str = r"^\d\. ";
-    let mut title_pattern: String = String::from("");
-    for _ in 0..depth {
-        title_pattern.push_str(base_pattern);
-    }
-    title_pattern
-}
-
 fn correct_titles(file_contents: &str, number_of_titles: usize) -> String {
     let mut processed_file_contents = String::from("");
     let mut title_number_range = 1..number_of_titles + 1;
     for line in file_contents.lines() {
         let processed_line;
-        if has_title(line) {
+        if has_title(line, 0) {
             let title_number = title_number_range.next().unwrap();
             processed_line = process_line(line, title_number);
         } else {
@@ -137,13 +148,14 @@ fn get_subtitle_positions_between_titles(
         .lines()
         .enumerate()
         .filter(|(line_number, line)| {
-            line_number < &previous_title_position && line_number > &next_title_position
+            previous_title_position > *line_number && *line_number < next_title_position
         });
     for (line_number, line) in lines_enumeration {
         if has_subtitle(line) {
             subtitle_positions.push(line_number);
         }
     }
+    println!("subtitle positions {:?}", &subtitle_positions);
     subtitle_positions
 }
 
