@@ -33,44 +33,10 @@ pub fn sort_numbered_titles(file_contents: &str) -> String {
             title_number,
             &subtitle_positions_between_titles,
             number_of_subtitles_between_titles,
-        )
+        );
     }
     let processed_file_contents = String::from("");
     processed_file_contents
-}
-
-fn correct_subtitles_between_titles(
-    file_lines: &mut Vec<String>,
-    title_number: usize,
-    subtitle_positions_between_titles: &Vec<usize>,
-    number_of_subtitles_between_titles: usize,
-) -> String {
-    let mut processed_file_contents = String::from("");
-    let mut subtitle_numbers_range = 1..number_of_subtitles_between_titles + 1;
-    let lines_enumeration = file_contents.lines().enumerate();
-    for (line_number, line) in lines_enumeration {
-        let processed_line;
-        if subtitle_positions_between_titles.contains(&line_number) {
-            let subtitle_number = subtitle_numbers_range.next().unwrap();
-            processed_line = process_subtitle_line(line, title_number, subtitle_number);
-        } else {
-            processed_line = line.to_string();
-        }
-        processed_file_contents = format!("{}{}\n", processed_file_contents, processed_line);
-    }
-    processed_file_contents
-}
-
-fn process_subtitle_line(line: &str, title_number: usize, subtitle_number: usize) -> String {
-    // TODO we are here
-    let new_subtitle = format!(
-        "{}.{}. ",
-        title_number.to_string(),
-        subtitle_number.to_string()
-    );
-    let re = Regex::new(r"^\d\.\d\. ").unwrap();
-    let processed_line = re.replace(line, new_subtitle).to_string();
-    processed_line
 }
 
 fn get_next_title_positions(title_positions: &Vec<usize>, number_of_lines: usize) -> Vec<usize> {
@@ -117,17 +83,28 @@ fn correct_titles(
     for title_position in title_positions {
         let title_number = title_number_range.next().unwrap();
         let line = &file_lines[*title_position];
-        let processed_line = process_line(line, title_number);
+        let processed_line = process_line(line, [title_number].to_vec());
         file_lines[*title_position] = processed_line;
     }
 }
 
-// TODO generalize with depth
-fn process_line(line: &String, line_number: usize) -> String {
-    let new_title = format!("{}. ", line_number.to_string());
-    let re = Regex::new(r"^\d\. ").unwrap();
+fn process_line(line: &String, title_numbers: Vec<usize>) -> String {
+    let title_depth: u64 = title_numbers.len() as u64 - 1;
+    let new_title = title_from(title_numbers);
+    let title_pattern = get_title_pattern(title_depth);
+    let re = Regex::new(&title_pattern).unwrap();
     let processed_line = re.replace(&line, new_title).to_string();
     processed_line
+}
+
+fn title_from(title_numbers: Vec<usize>) -> String {
+    let mut title = String::from("");
+    for title_number in title_numbers {
+        let title_fragment = format!("{}.", title_number.to_string());
+        title.push_str(&title_fragment);
+    }
+    title.push_str(" ");
+    title
 }
 
 fn get_subtitle_positions_between_titles(
@@ -140,14 +117,22 @@ fn get_subtitle_positions_between_titles(
         .filter(|x| previous_title_position < **x && **x < next_title_position)
         .map(|x| *x)
         .collect();
-    println!("{:?}", subtitle_positions_between_titles);
     subtitle_positions_between_titles
 }
 
-fn has_subtitle(line: &str) -> bool {
-    let re = Regex::new(r"^\d\.\d\. ").unwrap();
-    let has_subtitle = re.is_match(line);
-    has_subtitle
+fn correct_subtitles_between_titles(
+    file_lines: &mut Vec<String>,
+    title_number: usize,
+    subtitle_positions_between_titles: &Vec<usize>,
+    number_of_subtitles_between_titles: usize,
+) {
+    let mut subtitle_numbers_range = 1..number_of_subtitles_between_titles + 1;
+    for subtitle_position in subtitle_positions_between_titles {
+        let subtitle_number = subtitle_numbers_range.next().unwrap();
+        let line = &file_lines[*subtitle_position];
+        let processed_line = process_line(line, [title_number, subtitle_number].to_vec());
+        file_lines[*subtitle_position] = processed_line;
+    }
 }
 
 #[cfg(test)]
