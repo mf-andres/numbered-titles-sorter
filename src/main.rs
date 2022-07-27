@@ -19,5 +19,5 @@ fn main() {
     let source_file_path = cli.file;
     let file_contents = file_reader::read_file(&source_file_path);
     let processed_file_contents = numbered_titles_sorter::sort_numbered_titles(&file_contents);
-    file_writer::write_file(&processed_file_contents);
+    file_writer::write_file(&processed_file_contents, &source_file_path);
 }
