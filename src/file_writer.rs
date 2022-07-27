@@ -1,7 +1,5 @@
 use std::{fs, path};
 
-// process output
-// write lines
 pub fn write_file(processed_file_contents: &str, source_file_path: &str) {
     let source_file_path = path::Path::new(source_file_path);
     let source_file_path_parent = source_file_path.parent();
@@ -14,10 +12,4 @@ pub fn write_file(processed_file_contents: &str, source_file_path: &str) {
     let processed_file_name = format!("processed_{}", source_file_name);
     let target_file_path = source_file_path_parent.join(processed_file_name);
     fs::write(target_file_path, processed_file_contents).expect("Unable to write file");
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {}
 }
