@@ -42,4 +42,10 @@ Type:
 cargo run -- <file>
 ```
 
+For example:
+
+```
+cargo run -- example_documents/example_1.txt
+```
+
 It will process the given file and write a processed file under the same folder named "processed\_<file>"
