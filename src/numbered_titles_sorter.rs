@@ -10,20 +10,7 @@ pub fn sort_numbered_titles(file_contents: &str) -> String {
     let number_of_lines = file_lines.len();
 
     // Search for all title and subtitle positions
-    let mut title_positions_matrix: Vec<Vec<usize>> = vec![];
-    let mut n: u64 = 0;
-    loop {
-        let title_positions = title_finder::get_title_positions(file_contents, n);
-        if title_positions.len() == 0 {
-            n -= 1;
-            break;
-        } else {
-            title_positions_matrix.push(title_positions);
-            n += 1;
-        }
-    }
-    println!("title_positions_matrix: {:?}", &title_positions_matrix);
-    println!("n: {:?}", &n);
+    let title_positions_matrix = title_finder::get_title_positions_matrix(file_contents);
 
     let title_positions: Vec<usize> = title_positions_matrix[0].clone();
     let subtitle_positions: Vec<usize> = title_positions_matrix[1].clone();
