@@ -1,4 +1,4 @@
-pub(crate) fn get_title_pattern(title_depth: u64) -> String {
+pub(crate) fn get_title_pattern(title_depth: u32) -> String {
     let base_pattern: &str = r"^\d\.";
     let pattern_extension: &str = r"\d\.";
     let mut title_pattern: String = String::from(base_pattern);

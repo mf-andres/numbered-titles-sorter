@@ -3,7 +3,7 @@ use regex::Regex;
 use super::title_pattern_generator;
 
 pub(crate) fn process_line(line: &String, title_numbers: Vec<usize>) -> String {
-    let title_depth: u64 = title_numbers.len() as u64 - 1;
+    let title_depth: u32 = title_numbers.len() as u32 - 1;
     let new_title = title_from(title_numbers);
     let title_pattern = title_pattern_generator::get_title_pattern(title_depth);
     let re = Regex::new(&title_pattern).unwrap();

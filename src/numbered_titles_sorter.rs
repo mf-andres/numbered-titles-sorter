@@ -2,6 +2,7 @@ mod line_processor;
 mod subtitle_corrector;
 mod title_corrector;
 mod title_finder;
+mod title_node;
 mod title_pattern_generator;
 
 pub fn sort_numbered_titles(file_contents: &str) -> String {
@@ -11,7 +12,10 @@ pub fn sort_numbered_titles(file_contents: &str) -> String {
 
     // Search for all title and subtitle positions
     let title_positions_matrix = title_finder::get_title_positions_matrix(file_contents);
+    let root_title_node =
+        title_node::TitleNode::new(0, (0, number_of_lines), &title_positions_matrix);
 
+    //TODO change to tree driven solution
     let title_positions: Vec<usize> = title_positions_matrix[0].clone();
     let subtitle_positions: Vec<usize> = title_positions_matrix[1].clone();
 
