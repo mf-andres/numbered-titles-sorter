@@ -1,9 +1,15 @@
 [package]
 name = "numbered_titles_sorter"
+authors = ["Andres Munhoz <munozfernandezandres@gmail.com>"]
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "MIT OR Apache-2.0"
+description = "This repository contains a cli program to sort numbered titles (1., 1.1., 1.1.1, ...) in a text."
+readme = "README.md"
+homepage = "https://github.com/mf-andres/numbered-titles-sorter"
+repository = "https://github.com/mf-andres/numbered-titles-sorter"
+keywords = ["cli", "titles", "sorter"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 regex = "1"
