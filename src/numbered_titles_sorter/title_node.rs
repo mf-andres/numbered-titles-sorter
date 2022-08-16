@@ -17,7 +17,6 @@ impl<'a> TitleNode<'a> {
         file_lines_range: (usize, usize),
         title_positions_matrix: &Vec<Vec<usize>>,
     ) -> TitleNode {
-        println!("number {}", &number);
         let mut title_node = TitleNode {
             number,
             children: vec![],
@@ -57,7 +56,6 @@ impl<'a> TitleNode<'a> {
             );
             self.children.push(child);
         }
-        println!("subtitle_positions {:?}", &my_subtitle_positions);
     }
 
     fn get_my_subtitle_positions(&self) -> Vec<usize> {
