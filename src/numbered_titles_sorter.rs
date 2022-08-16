@@ -10,16 +10,20 @@ pub fn sort_numbered_titles(file_contents: &str) -> String {
 
     // Search for all title and subtitle positions
     let title_positions_matrix = title_finder::get_title_positions_matrix(file_contents);
+
+    // Build a tree of title nodes
     let root_title_node = title_node::TitleNode::new(
         "".to_string(),
         0,
         (0, number_of_lines),
         &title_positions_matrix,
     );
+
+    // Use the tree to correct all titles
     root_title_node.correct_children_lines(&mut file_lines);
 
+    // Build the processed file contents
     let processed_file_contents = file_lines.join("\n");
-    println!("{}", &processed_file_contents);
     processed_file_contents
 }
 
